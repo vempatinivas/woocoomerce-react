@@ -5,7 +5,7 @@ import Header from "../components/layout/Header";
 function Shop() {
   return (
     <div className="site-wrap">
-      <Header />
+      <Header linkActive="Shop" />
       <Breadcrumb />
 
       <div className="site-section">

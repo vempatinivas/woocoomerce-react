@@ -5,7 +5,7 @@ import Header from "../components/layout/Header";
 function About() {
   return (
     <div className="site-wrap">
-      <Header />
+      <Header linkActive="About" />
       <Breadcrumb />
       <div className="site-section border-bottom" data-aos="fade">
         <div className="container">

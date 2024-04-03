@@ -1,12 +1,32 @@
 import Footer from "../components/layout/Footer";
 import Header from "../components/layout/Header";
 
+import Carousel from "react-multi-carousel";
+import "react-multi-carousel/lib/styles.css";
+
 function Home() {
+  const responsive = {
+    desktop: {
+      breakpoint: { max: 3000, min: 1024 },
+      items: 3,
+      slidesToSlide: 3, // optional, default to 1.
+    },
+    tablet: {
+      breakpoint: { max: 1024, min: 464 },
+      items: 2,
+      slidesToSlide: 2, // optional, default to 1.
+    },
+    mobile: {
+      breakpoint: { max: 464, min: 0 },
+      items: 1,
+      slidesToSlide: 1, // optional, default to 1.
+    },
+  };
   return (
     <>
       <div className="site-wrap">
         {/*  Header */}
-        <Header />
+        <Header linkActive="Home" />
         <div
           className="site-blocks-cover"
           style={{ backgroundImage: "url(images/hero_1.jpg)" }}
@@ -153,8 +173,8 @@ function Home() {
             </div>
             <div className="row">
               <div className="col-md-12">
-                <div className="nonloop-block-3 owl-carousel">
-                  <div className="item">
+                <Carousel responsive={responsive}>
+                  <div className="item" style={{ marginRight: "20px" }}>
                     <div className="block-4 text-center">
                       <figure className="block-4-image">
                         <img
@@ -172,7 +192,7 @@ function Home() {
                       </div>
                     </div>
                   </div>
-                  <div className="item">
+                  <div className="item" style={{ marginRight: "20px" }}>
                     <div className="block-4 text-center">
                       <figure className="block-4-image">
                         <img
@@ -190,7 +210,7 @@ function Home() {
                       </div>
                     </div>
                   </div>
-                  <div className="item">
+                  <div className="item" style={{ marginRight: "20px" }}>
                     <div className="block-4 text-center">
                       <figure className="block-4-image">
                         <img
@@ -208,7 +228,7 @@ function Home() {
                       </div>
                     </div>
                   </div>
-                  <div className="item">
+                  <div className="item" style={{ marginRight: "20px" }}>
                     <div className="block-4 text-center">
                       <figure className="block-4-image">
                         <img
@@ -226,7 +246,7 @@ function Home() {
                       </div>
                     </div>
                   </div>
-                  <div className="item">
+                  <div className="item" style={{ marginRight: "20px" }}>
                     <div className="block-4 text-center">
                       <figure className="block-4-image">
                         <img
@@ -244,7 +264,7 @@ function Home() {
                       </div>
                     </div>
                   </div>
-                </div>
+                </Carousel>
               </div>
             </div>
           </div>

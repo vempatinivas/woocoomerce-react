@@ -1,6 +1,9 @@
 import MenuNav from "./MenuNav";
 
-function Header() {
+type headerProp = {
+  linkActive: string;
+};
+function Header({ linkActive }: headerProp) {
   return (
     <>
       <header className="site-navbar" role="banner">
@@ -54,7 +57,7 @@ function Header() {
             </div>
           </div>
         </div>
-        <MenuNav />
+        <MenuNav linkActive={linkActive} />
       </header>
     </>
   );

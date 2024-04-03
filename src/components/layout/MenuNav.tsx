@@ -1,5 +1,13 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
-function MenuNav() {
+
+type menuNavProp = {
+  linkActive: string;
+};
+
+function MenuNav({ linkActive }: menuNavProp) {
+  const [activeLink, setActiveLink] = useState(linkActive);
+  console.log("menu loaded");
   return (
     <nav
       className="site-navigation text-right text-md-center"
@@ -7,9 +15,11 @@ function MenuNav() {
     >
       <div className="container">
         <ul className="site-menu js-clone-nav d-none d-md-block">
-          <li className="has-children active">
-            <Link to="/">
-              <a>Home</a>
+          <li
+            className={`has-children ${activeLink == "Home" ? "active" : ""}`}
+          >
+            <Link to="/" onClick={() => setActiveLink("Home")}>
+              Home
             </Link>
             <ul className="dropdown">
               <li>
@@ -37,19 +47,19 @@ function MenuNav() {
               </li>
             </ul>
           </li>
-          <li>
-            <Link to="/about">
-              <a>About</a>
+          <li className={`${activeLink == "About" ? "active" : ""}`}>
+            <Link onClick={() => setActiveLink("About")} to="/about">
+              About
             </Link>
           </li>
-          <li>
-            <Link to="/shop">
-              <a>Shop</a>
+          <li className={`${activeLink == "Shop" ? "active" : ""}`}>
+            <Link onClick={() => setActiveLink("Shop")} to="/shop">
+              Shop
             </Link>
           </li>
-          <li>
-            <Link to="/contact">
-              <a>Contact</a>
+          <li className={`${activeLink == "Contact" ? "active" : ""}`}>
+            <Link onClick={() => setActiveLink("Contact")} to="/contact">
+              Contact
             </Link>
           </li>
         </ul>

@@ -5,7 +5,7 @@ import Header from "../components/layout/Header";
 function Contact() {
   return (
     <div className="site-wrap">
-      <Header />
+      <Header linkActive="Contact" />
       <Breadcrumb />
       <div className="site-section">
         <div className="container">
