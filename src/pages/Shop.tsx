@@ -1,8 +1,40 @@
+import { useEffect, useState } from "react";
 import Breadcrumb from "../components/layout/Breadcrumb";
 import Footer from "../components/layout/Footer";
 import Header from "../components/layout/Header";
 
+type Product = {
+  id: number;
+  title: string;
+  description: string;
+  price: number;
+  discountPercentage: number;
+  rating: number;
+  stock: number;
+  brand: string;
+  category: string;
+  thumbnail: string;
+  images: string[];
+};
+
 function Shop() {
+  // State to store products
+  const [products, setProducts] = useState<Product[]>([]);
+  const [pagination, setPagination] = useState(0);
+
+  // Fetch products on component mount
+  useEffect(() => {
+    fetch("https://dummyjson.com/products?limit=9&skip=" + pagination)
+      .then((response) => response.json())
+      .then((data) => {
+        // Assuming the response is an array of products
+        setProducts(data.products);
+      })
+      .catch((error) => {
+        console.error("Error fetching products:", error);
+      });
+  }, [pagination]);
+
   return (
     <div className="site-wrap">
       <Header linkActive="Shop" />
@@ -79,26 +111,31 @@ function Shop() {
                 </div>
               </div>
               <div className="row mb-5">
-                <div className="col-sm-6 col-lg-4 mb-4" data-aos="fade-up">
-                  <div className="block-4 text-center border">
-                    <figure className="block-4-image">
-                      <a href="shop-single.html">
-                        <img
-                          src="images/cloth_1.jpg"
-                          alt="Image placeholder"
-                          className="img-fluid"
-                        />
-                      </a>
-                    </figure>
-                    <div className="block-4-text p-4">
-                      <h3>
-                        <a href="shop-single.html">Tank Top</a>
-                      </h3>
-                      <p className="mb-0">Finding perfect t-shirt</p>
-                      <p className="text-primary font-weight-bold">$50</p>
+                {products.map((product) => (
+                  <div
+                    className="col-sm-6 col-lg-4 mb-4"
+                    data-aos="fade-up"
+                    key={product.id}
+                  >
+                    <div className="block-4 text-center border">
+                      <figure className="block-4-image">
+                        <a href="shop-single.html">
+                          <img src={product.thumbnail} className="img-fluid" />
+                        </a>
+                      </figure>
+                      <div className="block-4-text p-4">
+                        <h3>
+                          <a href="shop-single.html">{product.title}</a>
+                        </h3>
+                        <p className="mb-0">{product.description}</p>
+                        <p className="text-primary font-weight-bold">
+                          ${product.price}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
+                ))}
+
                 {/* Add more product cards here */}
               </div>
               <div className="row" data-aos="fade-up">
@@ -109,19 +146,19 @@ function Shop() {
                         <a href="#">&lt;</a>
                       </li>
                       <li className="active">
-                        <span>1</span>
+                        <span onClick={() => setPagination(0)}>1</span>
                       </li>
                       <li>
-                        <a href="#">2</a>
+                        <a onClick={() => setPagination(2 * 9)}>2</a>
                       </li>
                       <li>
-                        <a href="#">3</a>
+                        <a onClick={() => setPagination(3 * 9)}>3</a>
                       </li>
                       <li>
-                        <a href="#">4</a>
+                        <a onClick={() => setPagination(4 * 9)}>4</a>
                       </li>
                       <li>
-                        <a href="#">5</a>
+                        <a onClick={() => setPagination(5 * 9)}>5</a>
                       </li>
                       <li>
                         <a href="#">&gt;</a>
