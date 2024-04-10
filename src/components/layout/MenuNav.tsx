@@ -57,6 +57,11 @@ function MenuNav({ linkActive }: menuNavProp) {
               Shop
             </Link>
           </li>
+          <li className={`${activeLink == "Wocom" ? "active" : ""}`}>
+            <Link onClick={() => setActiveLink("Wocom")} to="/wocom">
+              Wocom
+            </Link>
+          </li>
           <li className={`${activeLink == "Contact" ? "active" : ""}`}>
             <Link onClick={() => setActiveLink("Contact")} to="/contact">
               Contact

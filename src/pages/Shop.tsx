@@ -21,14 +21,18 @@ function Shop() {
   // State to store products
   const [products, setProducts] = useState<Product[]>([]);
   const [pagination, setPagination] = useState(0);
+  const [pageNumbers, setPageNumbers] = useState<number[]>([]);
+  const Limit = 15;
+  const [total, setTotal] = useState(Limit);
 
   // Fetch products on component mount
   useEffect(() => {
-    fetch("https://dummyjson.com/products?limit=9&skip=" + pagination)
+    fetch(`https://dummyjson.com/products?limit=${Limit}&skip=${pagination}`)
       .then((response) => response.json())
       .then((data) => {
-        // Assuming the response is an array of products
         setProducts(data.products);
+        setTotal(data.total);
+        setPageNumbers(getPageNumbers(pagination, data.total, Limit));
       })
       .catch((error) => {
         console.error("Error fetching products:", error);
@@ -40,131 +44,158 @@ function Shop() {
       <Header linkActive="Shop" />
       <Breadcrumb />
 
-      <div className="site-section">
-        <div className="container">
-          <div className="row mb-5">
-            <div className="col-md-9 order-2">
-              <div className="row">
-                <div className="col-md-12 mb-5">
-                  <div className="float-md-left mb-4">
-                    <h2 className="text-black h5">Shop All</h2>
-                  </div>
-                  <div className="d-flex">
-                    <div className="dropdown mr-1 ml-md-auto">
-                      <button
-                        type="button"
-                        className="btn btn-secondary btn-sm dropdown-toggle"
-                        id="dropdownMenuOffset"
-                        data-toggle="dropdown"
-                        aria-haspopup="true"
-                        aria-expanded="false"
-                      >
-                        Latest
-                      </button>
-                      <div
-                        className="dropdown-menu"
-                        aria-labelledby="dropdownMenuOffset"
-                      >
-                        <a className="dropdown-item" href="#">
-                          Men
-                        </a>
-                        <a className="dropdown-item" href="#">
-                          Women
-                        </a>
-                        <a className="dropdown-item" href="#">
-                          Children
-                        </a>
-                      </div>
-                    </div>
-                    <div className="btn-group">
-                      <button
-                        type="button"
-                        className="btn btn-secondary btn-sm dropdown-toggle"
-                        id="dropdownMenuReference"
-                        data-toggle="dropdown"
-                      >
-                        Reference
-                      </button>
-                      <div
-                        className="dropdown-menu"
-                        aria-labelledby="dropdownMenuReference"
-                      >
-                        <a className="dropdown-item" href="#">
-                          Relevance
-                        </a>
-                        <a className="dropdown-item" href="#">
-                          Name, A to Z
-                        </a>
-                        <a className="dropdown-item" href="#">
-                          Name, Z to A
-                        </a>
-                        <div className="dropdown-divider"></div>
-                        <a className="dropdown-item" href="#">
-                          Price, low to high
-                        </a>
-                        <a className="dropdown-item" href="#">
-                          Price, high to low
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="row mb-5">
-                {products.map((product) => (
-                  <div
-                    className="col-sm-6 col-lg-4 mb-4"
-                    data-aos="fade-up"
-                    key={product.id}
-                  >
-                    <div className="block-4 text-center border">
-                      <figure className="block-4-image">
-                        <a href="shop-single.html">
-                          <img src={product.thumbnail} className="img-fluid" />
-                        </a>
-                      </figure>
-                      <div className="block-4-text p-4">
-                        <h3>
-                          <a href="shop-single.html">{product.title}</a>
-                        </h3>
-                        <p className="mb-0">{product.description}</p>
-                        <p className="text-primary font-weight-bold">
-                          ${product.price}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+      {/* Pagination */}
+      <div className="row" data-aos="fade-up">
+        <div className="col-md-12 text-center">
+          <div className="site-block-27">
+            <ul>
+              <li>
+                <a
+                  className={`${pagination > 0 ? "" : "disabled"}`}
+                  onClick={() => {
+                    pagination > 0 &&
+                      setPagination((currentValue) => currentValue - Limit);
+                  }}
+                >
+                  &lt;
+                </a>
+              </li>
 
-                {/* Add more product cards here */}
-              </div>
-              <div className="row" data-aos="fade-up">
-                <div className="col-md-12 text-center">
-                  <div className="site-block-27">
-                    <ul>
-                      <li>
-                        <a href="#">&lt;</a>
-                      </li>
-                      <li className="active">
-                        <span onClick={() => setPagination(0)}>1</span>
-                      </li>
-                      <li>
-                        <a onClick={() => setPagination(2 * 9)}>2</a>
-                      </li>
-                      <li>
-                        <a onClick={() => setPagination(3 * 9)}>3</a>
-                      </li>
-                      <li>
-                        <a onClick={() => setPagination(4 * 9)}>4</a>
-                      </li>
-                      <li>
-                        <a onClick={() => setPagination(5 * 9)}>5</a>
-                      </li>
-                      <li>
-                        <a href="#">&gt;</a>
-                      </li>
-                    </ul>
+              {pageNumbers.map((pageIndex) => (
+                <li
+                  key={pageIndex}
+                  className={pagination === pageIndex * Limit ? "active" : ""}
+                >
+                  <span onClick={() => setPagination(pageIndex * Limit)}>
+                    {pageIndex + 1}
+                  </span>
+                </li>
+              ))}
+
+              <li>
+                <a
+                  className={`${pagination + Limit < total ? "" : "disabled"}`}
+                  onClick={() => {
+                    pagination + Limit < total &&
+                      setPagination((currentValue) => currentValue + Limit);
+                  }}
+                >
+                  &gt;
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div className="site-section">
+            <div className="container">
+              <div className="row mb-5">
+                <div className="col-md-9 order-2">
+                  <div className="row">
+                    <div className="col-md-12 mb-5">
+                      <div className="float-md-left mb-4">
+                        <h2 className="text-black h5">Shop All</h2>
+                      </div>
+                      <div className="d-flex">
+                        <div className="dropdown mr-1 ml-md-auto">
+                          <button
+                            type="button"
+                            className="btn btn-secondary btn-sm dropdown-toggle"
+                            id="dropdownMenuOffset"
+                            data-toggle="dropdown"
+                            aria-haspopup="true"
+                            aria-expanded="false"
+                          >
+                            Latest
+                          </button>
+                          <div
+                            className="dropdown-menu"
+                            aria-labelledby="dropdownMenuOffset"
+                          >
+                            <a className="dropdown-item" href="#">
+                              Men
+                            </a>
+                            <a className="dropdown-item" href="#">
+                              Women
+                            </a>
+                            <a className="dropdown-item" href="#">
+                              Children
+                            </a>
+                          </div>
+                        </div>
+                        <div className="btn-group">
+                          <button
+                            type="button"
+                            className="btn btn-secondary btn-sm dropdown-toggle"
+                            id="dropdownMenuReference"
+                            data-toggle="dropdown"
+                          >
+                            Reference
+                          </button>
+                          <div
+                            className="dropdown-menu"
+                            aria-labelledby="dropdownMenuReference"
+                          >
+                            <a className="dropdown-item" href="#">
+                              Relevance
+                            </a>
+                            <a className="dropdown-item" href="#">
+                              Name, A to Z
+                            </a>
+                            <a className="dropdown-item" href="#">
+                              Name, Z to A
+                            </a>
+                            <div className="dropdown-divider"></div>
+                            <a className="dropdown-item" href="#">
+                              Price, low to high
+                            </a>
+                            <a className="dropdown-item" href="#">
+                              Price, high to low
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
+                  <div className="row mb-5">
+                    {products.map((product) => (
+                      <ProductCart key={product.id} product={product} /> // Pass the product prop correctly
+                    ))}
+                  </div>
+
+                  <p>
+                    {pagination > 0 && (
+                      <a
+                        style={{ marginRight: "10px" }}
+                        onClick={() => {
+                          setPagination((currentValue) => currentValue - Limit);
+                        }}
+                        className="btn btn-sm btn-primary"
+                      >
+                        Prev
+                      </a>
+                    )}
+
+                    {pagination + Limit < total && (
+                      <a
+                        onClick={() => {
+                          setPagination((currentValue) => currentValue + Limit);
+                        }}
+                        className="btn btn-sm btn-primary"
+                      >
+                        Next
+                      </a>
+                    )}
+                  </p>
+
+                  <p>
+                    <a
+                      onClick={() => {
+                        setPagination((currentValue) => Limit + currentValue);
+                      }}
+                      className="btn btn-sm btn-primary"
+                    >
+                      More
+                    </a>
+                  </p>
                 </div>
               </div>
             </div>
@@ -272,6 +303,46 @@ function Shop() {
       </div>
 
       <Footer />
+    </div>
+  );
+}
+
+function getPageNumbers(pagination: number, total: number, Limit: number) {
+  const maxPageNumbers = 5;
+  const totalPage = Math.ceil(total / Limit);
+  const maxPages = Math.min(totalPage, maxPageNumbers);
+
+  // Calculate the starting page number based on the current pagination
+  let startPage = Math.max(
+    0,
+    Math.floor(pagination / Limit) - Math.floor(maxPages / 2)
+  );
+  startPage = Math.min(startPage, totalPage - maxPages);
+  const pageNumbers = [];
+  // Generate page numbers to display
+  for (let i = startPage; i < startPage + maxPages; i++) {
+    pageNumbers.push(i);
+  }
+  return pageNumbers;
+}
+
+function ProductCart({ product }: { product: Product }) {
+  return (
+    <div className="col-sm-6 col-lg-4 mb-4" data-aos="fade-up" key={product.id}>
+      <div className="block-4 text-center border">
+        <figure className="block-4-image">
+          <a href="shop-single.html">
+            <img src={product.thumbnail} className="img-fluid" />
+          </a>
+        </figure>
+        <div className="block-4-text p-4">
+          <h3>
+            <a href="shop-single.html">{product.title}</a>
+          </h3>
+          <p className="mb-0">{product.description}</p>
+          <p className="text-primary font-weight-bold">${product.price}</p>
+        </div>
+      </div>
     </div>
   );
 }
