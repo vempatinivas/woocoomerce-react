@@ -98,17 +98,68 @@ type Product = {
   };
 };
 
+type WooCommerceCategory = {
+  id: number;
+  name: string;
+  slug: string;
+  parent: number;
+  description: string;
+  display: string;
+  image: any; // Define the type for image if needed
+  menu_order: number;
+  count: number;
+  _links: {
+    self: { href: string }[];
+    collection: { href: string }[];
+    up: { href: string }[];
+  };
+};
+
 function ShopWocom() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setcategories] = useState<WooCommerceCategory[]>([]);
   const [pagination, setPagination] = useState(1);
+  const [curretnCat, setcurretnCat] = useState(0);
   const Limit = 3;
 
   useEffect(() => {
     fetchProducts();
-  }, [pagination]);
+  }, [pagination, curretnCat]);
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = (): void => {
+    // Add your code here
+    fetch(`${baseURL}products/categories`, {
+      method: "GET",
+      headers: {
+        Authorization: `Basic ${btoa(
+          "ck_0b499b6914dc402bf6afeb695e3eebacfcf49fa3" +
+            ":" +
+            "cs_07cd071e2de9e4cb357286b65c38d56d02905d34"
+        )}`,
+      },
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log(data);
+        setcategories(data); // Update state with products data
+      })
+      .catch((error) => {
+        console.error("Error fetching categories:", error);
+      });
+  };
 
   let fetchProducts = (page = pagination, perPage = Limit) => {
-    fetch(`${baseURL}products?page=${page}&per_page=${perPage}`, {
+    let cat = curretnCat > 0 ? `&category=${curretnCat}` : "";
+    fetch(`${baseURL}products?page=${page}&per_page=${perPage}${cat}`, {
       method: "GET",
       headers: {
         Authorization: `Basic ${btoa(
@@ -139,7 +190,7 @@ function ShopWocom() {
       <Breadcrumb />
 
       {/* Pagination */}
-      <div className="row" data-aos="fade-up">
+      <div className="container " data-aos="fade-up">
         <div className="col-md-12 text-center">
           <div className="site-section">
             <div className="container">
@@ -228,115 +279,129 @@ function ShopWocom() {
                     </a>
                   </p>
                 </div>
-              </div>
-
-              <div className="col-md-3 order-1 mb-5 mb-md-0">
-                <div className="border p-4 rounded mb-4">
-                  <h3 className="mb-3 h6 text-uppercase text-black d-block">
-                    Categories
-                  </h3>
-                  <ul className="list-unstyled mb-0">
-                    <li className="mb-1">
-                      <a href="#" className="d-flex">
-                        <span>Men</span>{" "}
-                        <span className="text-black ml-auto">(2,220)</span>
-                      </a>
-                    </li>
-                    <li className="mb-1">
-                      <a href="#" className="d-flex">
-                        <span>Women</span>{" "}
-                        <span className="text-black ml-auto">(2,550)</span>
-                      </a>
-                    </li>
-                    <li className="mb-1">
-                      <a href="#" className="d-flex">
-                        <span>Children</span>{" "}
-                        <span className="text-black ml-auto">(2,124)</span>
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-                <div className="border p-4 rounded mb-4">
-                  <div className="mb-4">
+                <div className="col-md-3 order-1 mb-5 mb-md-0">
+                  <div className="border p-4 rounded mb-4">
                     <h3 className="mb-3 h6 text-uppercase text-black d-block">
-                      Filter by Price
+                      Categories
                     </h3>
-                    <div
-                      id="slider-range"
-                      className="border-primary ui-slider ui-corner-all ui-slider-horizontal ui-widget ui-widget-content"
-                    >
+                    <ul className="list-unstyled mb-0">
+                      {categories.map(
+                        (cat) =>
+                          cat.count > 0 &&
+                          cat.parent == curretnCat &&
+                          isSubcategoriesexists(curretnCat, categories) && (
+                            <li className="mb-1" key={cat.id}>
+                              <a
+                                onClick={() => {
+                                  setcurretnCat(cat.id);
+                                  setPagination(1);
+                                }}
+                                className="d-flex"
+                              >
+                                <span>{cat.name}</span>
+                                <span className="text-black ml-auto">
+                                  ({cat.count})
+                                </span>
+                              </a>
+                            </li>
+                          )
+                      )}
+                    </ul>
+                  </div>
+                  <div className="border p-4 rounded mb-4">
+                    <div className="mb-4">
+                      <h3 className="mb-3 h6 text-uppercase text-black d-block">
+                        Filter by Price
+                      </h3>
                       <div
-                        className="ui-slider-range ui-corner-all ui-widget-header"
-                        style={{ left: "15%", width: "45%" }}
-                      ></div>
-                      <span
-                        tabIndex="0"
-                        className="ui-slider-handle ui-corner-all ui-state-default"
-                        style={{ left: "15%" }}
-                      ></span>
-                      <span
-                        tabIndex="0"
-                        className="ui-slider-handle ui-corner-all ui-state-default"
-                        style={{ left: "60%" }}
-                      ></span>
+                        id="slider-range"
+                        className="border-primary ui-slider ui-corner-all ui-slider-horizontal ui-widget ui-widget-content"
+                      >
+                        <div
+                          className="ui-slider-range ui-corner-all ui-widget-header"
+                          style={{ left: "15%", width: "45%" }}
+                        ></div>
+                        <span
+                          tabIndex="0"
+                          className="ui-slider-handle ui-corner-all ui-state-default"
+                          style={{ left: "15%" }}
+                        ></span>
+                        <span
+                          tabIndex="0"
+                          className="ui-slider-handle ui-corner-all ui-state-default"
+                          style={{ left: "60%" }}
+                        ></span>
+                      </div>
+                      <input
+                        type="text"
+                        name="text"
+                        id="amount"
+                        className="form-control border-0 pl-0 bg-white"
+                        disabled=""
+                      />
                     </div>
-                    <input
-                      type="text"
-                      name="text"
-                      id="amount"
-                      className="form-control border-0 pl-0 bg-white"
-                      disabled=""
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <h3 className="mb-3 h6 text-uppercase text-black d-block">
-                      Size
-                    </h3>
-                    <label htmlFor="s_sm" className="d-flex">
-                      <input type="checkbox" id="s_sm" className="mr-2 mt-1" />{" "}
-                      <span className="text-black">Small (2,319)</span>
-                    </label>
-                    <label htmlFor="s_md" className="d-flex">
-                      <input type="checkbox" id="s_md" className="mr-2 mt-1" />{" "}
-                      <span className="text-black">Medium (1,282)</span>
-                    </label>
-                    <label htmlFor="s_lg" className="d-flex">
-                      <input type="checkbox" id="s_lg" className="mr-2 mt-1" />{" "}
-                      <span className="text-black">Large (1,392)</span>
-                    </label>
-                  </div>
-                  <div className="mb-4">
-                    <h3 className="mb-3 h6 text-uppercase text-black d-block">
-                      Color
-                    </h3>
-                    <a
-                      href="#"
-                      className="d-flex color-item align-items-center"
-                    >
-                      <span className="bg-danger color d-inline-block rounded-circle mr-2"></span>{" "}
-                      <span className="text-black">Red (2,429)</span>
-                    </a>
-                    <a
-                      href="#"
-                      className="d-flex color-item align-items-center"
-                    >
-                      <span className="bg-success color d-inline-block rounded-circle mr-2"></span>{" "}
-                      <span className="text-black">Green (2,298)</span>
-                    </a>
-                    <a
-                      href="#"
-                      className="d-flex color-item align-items-center"
-                    >
-                      <span className="bg-info color d-inline-block rounded-circle mr-2"></span>{" "}
-                      <span className="text-black">Blue (1,075)</span>
-                    </a>
-                    <a
-                      href="#"
-                      className="d-flex color-item align-items-center"
-                    >
-                      <span className="bg-primary color d-inline-block rounded-circle mr-2"></span>{" "}
-                      <span className="text-black">Purple (1,075)</span>
-                    </a>
+                    <div className="mb-4">
+                      <h3 className="mb-3 h6 text-uppercase text-black d-block">
+                        Size
+                      </h3>
+                      <label htmlFor="s_sm" className="d-flex">
+                        <input
+                          type="checkbox"
+                          id="s_sm"
+                          className="mr-2 mt-1"
+                        />{" "}
+                        <span className="text-black">Small (2,319)</span>
+                      </label>
+                      <label htmlFor="s_md" className="d-flex">
+                        <input
+                          type="checkbox"
+                          id="s_md"
+                          className="mr-2 mt-1"
+                        />{" "}
+                        <span className="text-black">Medium (1,282)</span>
+                      </label>
+                      <label htmlFor="s_lg" className="d-flex">
+                        <input
+                          type="checkbox"
+                          id="s_lg"
+                          className="mr-2 mt-1"
+                        />{" "}
+                        <span className="text-black">Large (1,392)</span>
+                      </label>
+                    </div>
+                    <div className="mb-4">
+                      <h3 className="mb-3 h6 text-uppercase text-black d-block">
+                        Color
+                      </h3>
+                      <a
+                        href="#"
+                        className="d-flex color-item align-items-center"
+                      >
+                        <span className="bg-danger color d-inline-block rounded-circle mr-2"></span>{" "}
+                        <span className="text-black">Red (2,429)</span>
+                      </a>
+                      <a
+                        href="#"
+                        className="d-flex color-item align-items-center"
+                      >
+                        <span className="bg-success color d-inline-block rounded-circle mr-2"></span>{" "}
+                        <span className="text-black">Green (2,298)</span>
+                      </a>
+                      <a
+                        href="#"
+                        className="d-flex color-item align-items-center"
+                      >
+                        <span className="bg-info color d-inline-block rounded-circle mr-2"></span>{" "}
+                        <span className="text-black">Blue (1,075)</span>
+                      </a>
+                      <a
+                        href="#"
+                        className="d-flex color-item align-items-center"
+                      >
+                        <span className="bg-primary color d-inline-block rounded-circle mr-2"></span>{" "}
+                        <span className="text-black">Purple (1,075)</span>
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -348,6 +413,19 @@ function ShopWocom() {
       <Footer />
     </div>
   );
+}
+
+function isSubcategoriesexists(
+  catId: number,
+  categories: WooCommerceCategory[]
+) {
+  let subCat = false;
+  categories.map((cat) => {
+    if (cat.parent == catId) {
+      subCat = true;
+    }
+  });
+  return subCat;
 }
 
 function ProductCart({ product }: { product: Product }) {
